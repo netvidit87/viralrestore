@@ -27,10 +27,10 @@
     }
   </script>
 
-  <!-- TensorFlow.js + UpscalerJS -->
+  <!-- TensorFlow.js + UpscalerJS (latest recommended) -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@upscalerjs/esrgan-slim@1.0.0-beta.12/dist/umd/2x.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/upscaler@1.0.0-beta.19/dist/browser/umd/upscaler.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@upscalerjs/esrgan-slim@latest/dist/umd/2x.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/upscaler@latest/dist/browser/umd/upscaler.min.js"></script>
 
   <style>
     /* Before-After Slider */
@@ -205,6 +205,13 @@
     async function initUpscaler() {
       if (upscaler) return upscaler;
       try {
+        // Wait a bit for global to be available if scripts are still loading
+        if (typeof ESRGANSlim2x === "undefined") {
+          await new Promise(r => setTimeout(r, 800));
+        }
+        if (typeof ESRGANSlim2x === "undefined") {
+          throw new Error("ESRGANSlim2x model failed to load. Please refresh the page.");
+        }
         upscaler = new Upscaler({
           model: ESRGANSlim2x,
         });
@@ -465,7 +472,7 @@
     dropzone.addEventListener("drop", (e) => {
       e.preventDefault();
       dropzone.classList.remove("border-sky-500", "bg-slate-900/70");
-      if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
+    if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
     });
 
     fileInput.addEventListener("change", () => {
